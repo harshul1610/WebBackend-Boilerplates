@@ -13,7 +13,6 @@ ipaddress==1.0.22
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.0
-pkg-resources==0.0.0
 py-vapid==1.4.0
 pycparser==2.19
 pytz==2018.9
