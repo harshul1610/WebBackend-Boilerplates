@@ -64,18 +64,14 @@ def SaveInformation(request):
             elif status_type == 'subscribe':
                 return HttpResponse(status=201)
         else:
-            try:
-                anonymous_user = User(username='Anonymous')
-                anonymous_user.save()
-            except:
-                return HttpResponse(status=201)
-
+            user, created = User.objects.get_or_create(username='Anonymous')
+            
             subscription = sub_form.get_or_save()
             web_push_data = web_push_form.cleaned_data
             # get the status type
             status_type = web_push_data.pop('status_type')
             # save or delete the information based on status
-            web_push_form.save_or_delete(subscription=subscription , user=anonymous_user, status_type=status_type)
+            web_push_form.save_or_delete(subscription=subscription , user=user, status_type=status_type)
             # return the http status response accordingly.
             if status_type == 'unsubscribe':
                 return HttpResponse(status=202)
