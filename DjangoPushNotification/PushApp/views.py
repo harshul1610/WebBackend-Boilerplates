@@ -121,7 +121,7 @@ def SendNotification(request):
                 req = webpush(subscription_info=final_subscription_data, data=json.dumps(payload), ttl=0, **vapid_data)
 
             except WebPushException as ex:
-                errors.append(dict(subscription=push_info.subscription,
+                errors.append(dict(subscription=pushinfo_obj.subscription,
                                 exception=ex))
         if errors:
             raise WebPushException("Push failed.", extra=errors)
