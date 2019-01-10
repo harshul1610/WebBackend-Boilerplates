@@ -20,7 +20,7 @@ class WebPushForm(forms.Form):
         data = {}
         data['user'] = user
         data['subscription'] = subscription
-        #push_obj, created = PushInformation.objects.get_or_create(**data)
+        push_obj, created = PushInformation.objects.get_or_create(**data)
         if status_type == 'unsubscribe':
-            #push_obj.delete()
+            push_obj.delete()
             subscription.delete()

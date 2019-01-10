@@ -7,6 +7,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from .forms import SubscriptionInformationform, WebPushForm
+from django.contrib.auth.models import User
 
 
 # Create your views here.
@@ -46,7 +47,7 @@ def SaveInformation(request):
 
     if sub_form.is_valid() and web_push_form.is_valid():
         # If user is present save the subscription info in the subscriptioninformation model.
-        if request.user:
+        if request.user.is_authenticated():
             subscription = sub_form.get_or_save()
             web_push_data = web_push_form.cleaned_data
             # get the status type
@@ -58,4 +59,22 @@ def SaveInformation(request):
                 return HttpResponse(status=202)
             elif status_type == 'subscribe':
                 return HttpResponse(status=201)
+        else:
+            anonymous_user = User(username='Anonymous')
+            anonymous_user.save()
+
+            subscription = sub_form.get_or_save()
+            web_push_data = web_push_form.cleaned_data
+            # get the status type
+            status_type = web_push_data.pop('status_type')
+            # save or delete the information based on status
+            web_push_form.save_or_delete(subscription=subscription , user=anonymous_user, status_type=status_type)
+            # return the http status response accordingly.
+            if status_type == 'unsubscribe':
+                return HttpResponse(status=202)
+            elif status_type == 'subscribe':
+                return HttpResponse(status=201)
     return HttpResponse(status=400)
+
+def SendNotification(request):
+    pass
