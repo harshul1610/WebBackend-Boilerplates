@@ -40,7 +40,7 @@ function urlB64ToUint8Array(base64String) {
     return outputData;
 }
 
-// Once the User grants permission, subscribe the application with the user id and application VAPID Key.
+// Once the User grants permission, subscribe the application with the application VAPID Key.
 // Send the Application subscription info to the database for that user.
 const subscribe = async (reg) => {
     const subscription = await reg.pushManager.getSubscription();
