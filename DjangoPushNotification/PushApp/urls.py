@@ -7,6 +7,6 @@ urlpatterns = [
     url(r'^$', views.home),
     url(r'^serviceworker.js', views.ServiceWorkerView.as_view()),
     url(r'^saveinformation', views.SaveInformation),
-    url(r'^sendnotification', views.SendNotification)
+    url(r'^sendnotification', views.SendNotification),
     
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

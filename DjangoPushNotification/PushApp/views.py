@@ -3,11 +3,15 @@ from __future__ import unicode_literals
 import json
 from django.views.generic import TemplateView
 from django.shortcuts import render, HttpResponse
+from django.http.response import JsonResponse
 from django.conf import settings
+from django.forms.models import model_to_dict
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from .forms import SubscriptionInformationform, WebPushForm
 from django.contrib.auth.models import User
+from pywebpush import WebPushException, webpush
 
 
 # Create your views here.
@@ -60,8 +64,11 @@ def SaveInformation(request):
             elif status_type == 'subscribe':
                 return HttpResponse(status=201)
         else:
-            anonymous_user = User(username='Anonymous')
-            anonymous_user.save()
+            try:
+                anonymous_user = User(username='Anonymous')
+                anonymous_user.save()
+            except:
+                return HttpResponse(status=201)
 
             subscription = sub_form.get_or_save()
             web_push_data = web_push_form.cleaned_data
@@ -77,4 +84,47 @@ def SaveInformation(request):
     return HttpResponse(status=400)
 
 def SendNotification(request):
-    pass
+    try:
+        user_obj = request.user
+        if not request.user.is_authenticated():
+            user_obj = User.objects.get(username='Anonymous')
+
+        pushinfo_objs = user_obj.pushinfo.select_related("subscription")
+
+        errors = []
+        for pushinfo_obj in pushinfo_objs:
+            try:
+                subscription_data = model_to_dict(pushinfo_obj.subscription, exclude=['browser', 'id'])
+                print subscription_data
+                endpoint = subscription_data['endpoint']
+                p256dh = subscription_data['p256dh']
+                auth = subscription_data['auth']
+
+                final_subscription_data = {
+                    'endpoint': endpoint,
+                    'keys': {'auth': auth, 'p256dh': p256dh}
+                }
+
+                vapid_data = {}
+
+                vapid_settings = getattr(settings, 'VAPID_SETTINGS', {})
+                vapid_private_key = vapid_settings.get('VAPID_PRIVATE_KEY')
+                vapid_admin_email = vapid_settings.get('VAPID_ADMIN_EMAIL')
+
+                if vapid_private_key:
+                    vapid_data = {
+                        'vapid_private_key': vapid_private_key,
+                        'vapid_claims': {"sub": "mailto:{}".format(vapid_admin_email)}
+                    }
+                payload = {'head': 'Web Push Example', 'body': 'Hell Yeah! Notification Works!'}
+
+                req = webpush(subscription_info=final_subscription_data, data=json.dumps(payload), ttl=0, **vapid_data)
+
+            except WebPushException as ex:
+                errors.append(dict(subscription=push_info.subscription,
+                                exception=ex))
+        if errors:
+            raise WebPushException("Push failed.", extra=errors)
+        return JsonResponse(status=200, data={"message": "Web push successful"})
+    except TypeError:
+        return JsonResponse(status=500, data={"message": "An error occurred"})
