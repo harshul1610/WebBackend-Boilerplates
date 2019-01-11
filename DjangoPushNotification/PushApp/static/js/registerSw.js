@@ -52,12 +52,11 @@ const subscribe = async (reg) => {
 
     console.log('subscribing the application');
     const vapidMeta = document.querySelector('meta[name="vapid-key"]');
-    const key = vapidMeta.textContent;
+    const key = vapidMeta.content;
     const options = {
         userVisibleOnly: true,
         ...(key && {applicationServerKey: urlB64ToUint8Array(key)}),
     };
-    console.log(options);
     const sub = await reg.pushManager.subscribe(options);
     sendSubData(sub);
 }
