@@ -87,11 +87,10 @@ def SendNotification(request):
 
         pushinfo_objs = user_obj.pushinfo.select_related("subscription")
 
-        errors = []
+        loginfo = []
         for pushinfo_obj in pushinfo_objs:
             try:
                 subscription_data = model_to_dict(pushinfo_obj.subscription, exclude=['browser', 'id'])
-                print subscription_data
                 endpoint = subscription_data['endpoint']
                 p256dh = subscription_data['p256dh']
                 auth = subscription_data['auth']
@@ -115,12 +114,10 @@ def SendNotification(request):
                 payload = {'head': 'Web Push Example', 'body': 'Hell Yeah! Notification Works!'}
 
                 req = webpush(subscription_info=final_subscription_data, data=json.dumps(payload), ttl=0, **vapid_data)
-
+                loginfo.append('Web Push Successful')
             except WebPushException as ex:
-                errors.append(dict(subscription=pushinfo_obj.subscription,
-                                exception=ex))
-        if errors:
-            raise WebPushException("Push failed.", extra=errors)
-        return JsonResponse(status=200, data={"message": "Web push successful"})
+                loginfo.append(ex.message)
+
+        return JsonResponse(status=200, data={"message": ','.join(loginfo)})
     except TypeError:
-        return JsonResponse(status=500, data={"message": "An error occurred"})
+        return JsonResponse(status=200, data={"message": 'Error in Push Notification'})

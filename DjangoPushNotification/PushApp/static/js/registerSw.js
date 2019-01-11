@@ -46,7 +46,7 @@ const subscribe = async (reg) => {
     const subscription = await reg.pushManager.getSubscription();
     if (subscription) {
         console.log('subscription already done');
-        sendSubData(subscription);
+        sendSubData(subscription, 'subscribe');
         return;
     }
 
@@ -58,13 +58,13 @@ const subscribe = async (reg) => {
         ...(key && {applicationServerKey: urlB64ToUint8Array(key)}),
     };
     const sub = await reg.pushManager.subscribe(options);
-    sendSubData(sub);
+    sendSubData(sub, 'subscribe');
 }
 
-const sendSubData = async (subscription) => {
+const sendSubData = async (subscription, status_type) => {
     const browser = navigator.userAgent.match(/(firefox|msie|chrome|safari|trident)/ig)[0].toLowerCase();
     const data = {
-        status_type: 'subscribe',
+        status_type: status_type,
         subscription: subscription.toJSON(),
         browser: browser,
     };
