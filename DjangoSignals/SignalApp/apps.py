@@ -6,3 +6,6 @@ from django.apps import AppConfig
 
 class SignalappConfig(AppConfig):
     name = 'SignalApp'
+
+    def ready(self):
+        import SignalApp.signals

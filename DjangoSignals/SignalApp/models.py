@@ -12,4 +12,8 @@ class Contact(models.Model):
 
     def __repr__(self):
         return "{}:{}".format(self.contact_name, self.phone_number)
+    
+    def __str__(self):
+        return "{}:{}".format(self.contact_name, self.phone_number)
+        
 
