@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.core.validators import RegexValidator
+from SignalApp.signals2 import pre_contact_added_signal
+
 
 # Create your models here.
 class Contact(models.Model):
@@ -16,4 +18,7 @@ class Contact(models.Model):
     def __str__(self):
         return "{}:{}".format(self.contact_name, self.phone_number)
         
+    def save(self, *args, **kwargs):
+        pre_contact_added_signal.send(sender=Contact, contact = self)
+        super(Contact, self).save(*args, **kwargs)
 

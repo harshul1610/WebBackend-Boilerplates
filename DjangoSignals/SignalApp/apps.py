@@ -9,3 +9,4 @@ class SignalappConfig(AppConfig):
 
     def ready(self):
         import SignalApp.signals
+        import SignalApp.signals2
