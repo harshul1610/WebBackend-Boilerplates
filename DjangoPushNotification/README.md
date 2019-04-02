@@ -16,6 +16,8 @@ Push Notification system is divided into 3 parts:
   - Sends the subscription info to the backend service to persist it in the database relative to the user.
 
  
+![flow diagram](https://github.com/harshul1610/WebBackend-Boilerplates/blob/master/DjangoPushNotification/pushnotification-flow.png)
+
 ### Instructions to run the App
 
 ```
