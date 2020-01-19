@@ -111,9 +111,11 @@ def SendNotification(request):
                         'vapid_private_key': vapid_private_key,
                         'vapid_claims': {"sub": "mailto:{}".format(vapid_admin_email)}
                     }
+                #print(vapid_data)
                 payload = {'head': 'Web Push Example', 'body': 'Hell Yeah! Notification Works!'}
-
+                
                 req = webpush(subscription_info=final_subscription_data, data=json.dumps(payload), ttl=0, **vapid_data)
+                
                 loginfo.append('Web Push Successful')
             except WebPushException as ex:
                 loginfo.append(ex.message)

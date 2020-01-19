@@ -25,6 +25,10 @@ python manage.py migrate
 python manage.py runserver
 ```
 ```
+Get the Vapid ey from https://tools.reactpwa.com/vapid
+update the update the VAPID key in settings.py
+```
+```
 Go to http://localhost:8000 and give the permissions to receive the notifications.
 ```
 ```
