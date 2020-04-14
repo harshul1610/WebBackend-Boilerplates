@@ -10,7 +10,7 @@ def home(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            print 'saving the form'
+            print('saving the form')
             form.save()
     else:
         form = ContactForm()
